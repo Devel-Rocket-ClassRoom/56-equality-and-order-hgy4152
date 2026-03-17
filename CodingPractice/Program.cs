@@ -142,17 +142,101 @@ Console.WriteLine($"일반 Dictionary에서 'apple' 존재 여부: {d4.ContainsK
 
 
 
+var quest = new List<Quest>
+{
+    new Quest(1, 10000, "드래곤 처치"),
+    new Quest(3, 100, "약초 수집"),
+    new Quest(2, 500, "마을 방어"),
+    new Quest(2, 3000, "보물 찾기")
+};
+
+Console.WriteLine($"우선순위 기준 정렬:");
+
+var priority = new QuestPriorityComparer();
+var reward = new QuestRewardComparer();
+
+quest.Sort(priority);
+
+foreach (Quest q in quest)
+{
+    Console.WriteLine(q);
+}
+Console.WriteLine($"보상 기준 정렬(내림차순):");
+
+quest.Sort(reward);
+
+foreach (Quest q in quest)
+{
+    Console.WriteLine(q);
+}
+
+
+string[] fruits = { "apple", "Banana", "CHERRY", "date", "Elderberry" };
+
+Console.WriteLine("Ordinal 정렬 (대소문자 구분)");
+Array.Sort(fruits, StringComparer.Ordinal);
+Console.WriteLine(string.Join(", ",fruits));
+
+Console.WriteLine("OrdinalIgnoreCase 정렬:");
+Array.Sort(fruits, StringComparer.OrdinalIgnoreCase);
+Console.WriteLine(string.Join(", ",fruits));
+
+
+var product = new List<Product>
+{
+    new Product("키보드", 50000),
+    new Product("마우스", 30000),
+    new Product("모니터", 300000),
+    new Product("헤드셋", 80000)
+};
+Comparer<Product> price = Comparer<Product>.Create((x,y) => x.Price.CompareTo(y.Price));  // 비교기 생성
+
+product.Sort(price);
+
+Console.WriteLine("가격 오름차순:");
+foreach (Product p in product)
+{
+    Console.WriteLine(p);
+}
+
+Comparer<Product> name = Comparer<Product>.Create((x, y) => y.Name.CompareTo(x.Name));  // 비교기 생성
+product.Sort(name);
+
+Console.WriteLine("이름 내림차순:");
+
+foreach (Product p in product)
+{
+    Console.WriteLine(p);
+}
+class Product
+{
+    public string Name { get; set; }
+    public int Price;
+
+    public Product(string name, int price)
+    {
+        Name = name;
+        Price = price;
+    }
+
+    public override string ToString()
+    {
+        return $"  {Name}: {Price}원";
+    }
+}
+
+
 class QuestRewardComparer : Comparer<Quest>
 {
     public override int Compare(Quest x, Quest y)
     {
-        throw new NotImplementedException();
+        return y.Reward.CompareTo(x.Reward);
     }
 
 
-    public int GetHashCode([DisallowNull] Quest obj)
+    public int GetHashCode(Quest obj)
     {
-        throw new NotImplementedException();
+       return HashCode.Combine(obj.Priority, obj.Reward, obj.Name);
     }
 }
 
@@ -160,12 +244,14 @@ class QuestPriorityComparer : Comparer<Quest>
 {
     public override int Compare(Quest x, Quest y)
     {
-        throw new NotImplementedException();
+        return x.Priority.CompareTo(y.Priority);
+
     }
 
     public int GetHashCode([DisallowNull] Quest obj)
     {
-        throw new NotImplementedException();
+        return HashCode.Combine(obj.Priority, obj.Reward, obj.Name);
+
     }
 }
 
